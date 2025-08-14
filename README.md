@@ -34,7 +34,7 @@ track report -c <client> -p "this week"
 track status
 ```
 
-If flags are omitted, the command starts **an interactive session** with arrow-key pickers for client and task, plus a styled description prompt (description is optional).
+⚡ But you actually just omit the flags! In that case, the command starts **an interactive session** with arrow-key pickers for client and task, plus a styled description prompt (description is optional).
 
 - `track start`: begin a new log. If `-c`/`-t` omitted, pick from history or create new. `-d` description is optional.
 - `track end`: close an open log (choose which one if multiple are open).
