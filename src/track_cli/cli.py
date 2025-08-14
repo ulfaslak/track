@@ -15,7 +15,11 @@ import questionary
 from rich.panel import Panel
 from rich import box
 
-app = typer.Typer(add_completion=False, no_args_is_help=True, help="Track working hours by client and task.")
+app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="Track working hours by client and task.",
+)
 console = Console()
 
 
@@ -30,10 +34,14 @@ FILENAME_PATTERN = re.compile(r"^(\d{8})-(\d+)---(.+?)---(open|closed)\.log$")
 # Period options used in interactive selection and validation
 PERIOD_OPTIONS = [
     "today",
-    "this week", "last week",
-    "this month", "last month",
-    "this quarter", "last quarter",
-    "this year", "last year",
+    "this week",
+    "last week",
+    "this month",
+    "last month",
+    "this quarter",
+    "last quarter",
+    "this year",
+    "last year",
 ]
 
 
@@ -91,22 +99,28 @@ def _is_interactive() -> bool:
 
 
 def _prompt_for_log_dir() -> Path:
-    console.print(Panel.fit(
-        "[bold yellow]Log path not configured.[/bold yellow]\n"
-        "Please enter a folder to store your time logs.",
-        title="Configure log path",
-        border_style="yellow",
-    ))
+    console.print(
+        Panel.fit(
+            "[bold yellow]Log path not configured.[/bold yellow]\n"
+            "Please enter a folder to store your time logs.",
+            title="Configure log path",
+            border_style="yellow",
+        )
+    )
     default_path = str(Path.home() / "track_logs")
     while True:
         if _is_interactive():
-            entered = questionary.text("Log folder path", default=default_path).ask() or ""
+            entered = (
+                questionary.text("Log folder path", default=default_path).ask() or ""
+            )
         else:
             entered = input(f"Log folder path [{default_path}]: ") or default_path
         p = _ensure_viable_directory(entered)
         if p is not None:
             _write_config_path(str(p))
-            console.print(f"[green]Saved[/green] log path to [bold]{CONFIG_FILE}[/bold]")
+            console.print(
+                f"[green]Saved[/green] log path to [bold]{CONFIG_FILE}[/bold]"
+            )
             return p
         console.print("[red]That path is not writable or invalid. Try again.[/red]")
 
@@ -118,7 +132,9 @@ def get_log_dir() -> Path:
         p = _ensure_viable_directory(env)
         if p is not None:
             return p
-        console.print(f"[yellow]{LOG_ENV_VAR} is set but not usable. Falling back to config/prompt.[/yellow]")
+        console.print(
+            f"[yellow]{LOG_ENV_VAR} is set but not usable. Falling back to config/prompt.[/yellow]"
+        )
 
     # 2) Read from config file if present
     conf = _read_config_path()
@@ -126,7 +142,9 @@ def get_log_dir() -> Path:
         p = _ensure_viable_directory(conf)
         if p is not None:
             return p
-        console.print("[yellow]Configured log path is not usable. You'll be prompted to set a new one.[/yellow]")
+        console.print(
+            "[yellow]Configured log path is not usable. You'll be prompted to set a new one.[/yellow]"
+        )
 
     # 3) Prompt the user and persist to config
     return _prompt_for_log_dir()
@@ -159,8 +177,7 @@ def next_sequence_for_today(log_dir: Path, yyyymmdd: str) -> int:
 def build_filename(yyyymmdd: str, seq: int, client: str, status: str) -> str:
     # Sanitize client for safe filename usage; keep it readable
     safe_client = (
-        client
-        .replace("/", "-")
+        client.replace("/", "-")
         .replace("\\", "-")
         .replace("*", "-")
         .replace("?", "-")
@@ -191,7 +208,9 @@ def parse_log_file(path: Path) -> Dict[str, str]:
 
 
 def find_open_logs(log_dir: Path) -> List[Path]:
-    return sorted([p for p in log_dir.glob("*---open.log") if FILENAME_PATTERN.match(p.name)])
+    return sorted(
+        [p for p in log_dir.glob("*---open.log") if FILENAME_PATTERN.match(p.name)]
+    )
 
 
 def duration_hours(start: str, end: str) -> float:
@@ -282,7 +301,7 @@ def parse_period(period_description: str) -> Tuple[datetime, datetime]:
         if unit == "week":
             s, e = week_range(today - timedelta(weeks=1))
         elif unit == "month":
-            d = (today.replace(day=1) - timedelta(days=1))
+            d = today.replace(day=1) - timedelta(days=1)
             s, e = month_range(d)
         elif unit == "quarter":
             month = ((today.month - 1) // 3) * 3 + 1
@@ -314,11 +333,14 @@ def within_period(file_date: str, start: datetime, end: datetime) -> bool:
 # Commands
 # ---------------------------
 
+
 @app.command()
 def start(
     c: Optional[str] = typer.Option(None, "-c", "--client", help="Client name"),
     t: Optional[str] = typer.Option(None, "-t", "--task", help="Task name"),
-    d: Optional[str] = typer.Option(None, "-d", "--description", help="Task description"),
+    d: Optional[str] = typer.Option(
+        None, "-d", "--description", help="Task description"
+    ),
 ):
     """Start a tracking log."""
     log_dir = get_log_dir()
@@ -385,11 +407,13 @@ def start(
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    console.print(Panel.fit(
-        f"[bold green]Started[/bold green] {c}\n[dim]{path.name}[/dim]",
-        title="track start",
-        border_style="green",
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold green]Started[/bold green] {c}\n[dim]{path.name}[/dim]",
+            title="track start",
+            border_style="green",
+        )
+    )
 
 
 @app.command()
@@ -429,25 +453,34 @@ def end():
     new_path = chosen.with_name(new_name)
     chosen.rename(new_path)
 
-    console.print(Panel.fit(
-        f"[bold green]Closed[/bold green] {client}\n[dim]{new_path.name}[/dim]",
-        title="track end",
-        border_style="green",
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold green]Closed[/bold green] {client}\n[dim]{new_path.name}[/dim]",
+            title="track end",
+            border_style="green",
+        )
+    )
 
 
 @app.command()
 def report(
     c: Optional[str] = typer.Option(None, "-c", "--client", help="Client name"),
-    p: Optional[str] = typer.Option(None, "-p", "--period", help="Period, e.g. 'this week', 'last month'"),
+    p: Optional[str] = typer.Option(
+        None, "-p", "--period", help="Period, e.g. 'this week', 'last month'"
+    ),
 ):
     """Show aggregated time for a client and period, broken down by task."""
     log_dir = get_log_dir()
 
     # Interactive choices if needed
     if not c:
-        clients = sorted({FILENAME_PATTERN.match(p.name).group(3)
-                          for p in log_dir.glob("*.log") if FILENAME_PATTERN.match(p.name)})
+        clients = sorted(
+            {
+                FILENAME_PATTERN.match(p.name).group(3)
+                for p in log_dir.glob("*.log")
+                if FILENAME_PATTERN.match(p.name)
+            }
+        )
         if not clients:
             console.print("[bold yellow]No logs found.[/bold yellow]")
             raise typer.Exit()
@@ -523,8 +556,13 @@ def report(
         table.add_row("No data", "0.00")
     console.print(table)
 
-    console.print(Panel.fit(f"Total: [bold]{total_hours:.2f}[/bold] hours",
-                            border_style="cyan", title="Summary"))
+    console.print(
+        Panel.fit(
+            f"Total: [bold]{total_hours:.2f}[/bold] hours",
+            border_style="cyan",
+            title="Summary",
+        )
+    )
 
 
 @app.command()
@@ -569,10 +607,14 @@ def status():
         table.add_row(client, task, start or "-", elapsed_str, p.name)
 
     console.print(table)
-    console.print(Panel.fit(f"Total running: [bold]{total_running_hours:.2f}[/bold] hours",
-                            border_style="cyan", title="Summary"))
+    console.print(
+        Panel.fit(
+            f"Total running: [bold]{total_running_hours:.2f}[/bold] hours",
+            border_style="cyan",
+            title="Summary",
+        )
+    )
+
 
 if __name__ == "__main__":
     app()
-
-
