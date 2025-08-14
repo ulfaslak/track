@@ -10,10 +10,10 @@ Dead simple terminal app to track your working hours across **clients** and **ta
 Install
 -------
 
-Install from PyPI (recommended):
+Install directly from Git (coming to PyPI soon!):
 
 ```bash
-pip install track-cli
+pip install "git+https://github.com/ulfaslak/track.git@main"
 ```
 
 Or install from source for development:
