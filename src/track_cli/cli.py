@@ -29,6 +29,7 @@ FILENAME_PATTERN = re.compile(r"^(\d{8})-(\d+)---(.+?)---(open|closed)\.log$")
 
 # Period options used in interactive selection and validation
 PERIOD_OPTIONS = [
+    "today",
     "this week", "last week",
     "this month", "last month",
     "this quarter", "last quarter",
@@ -255,7 +256,9 @@ def parse_period(period_description: str) -> Tuple[datetime, datetime]:
         end = date(d.year, 12, 31)
         return start, end
 
-    if pd.startswith("this "):
+    if pd == "today":
+        s = e = today
+    elif pd.startswith("this "):
         unit = pd.split(" ", 1)[1]
         if unit == "week":
             s, e = week_range(today)
