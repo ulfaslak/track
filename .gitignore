@@ -1,0 +1,20 @@
+# Environment variables
+.env
+
+# Ignore DS_Store
+.DS_Store
+
+# Ignore compiled Python files
+*.pyc
+
+# Ignore cache directories
+__pycache__/
+
+# Ignore VSCode files
+.vscode/
+
+# Ignore Ruff cache
+.ruff_cache/
+
+# Ignore pytest cache
+.pytest_cache/
