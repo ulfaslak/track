@@ -166,7 +166,14 @@ def build_filename(yyyymmdd: str, seq: int, client: str, status: str) -> str:
         .replace("?", "-")
         .replace("[", "(")
         .replace("]", ")")
+        .replace(":", "-")
+        .replace("<", "(")
+        .replace(">", ")")
+        .replace("|", "-")
+        .replace('"', "'")
     )
+    # Avoid trailing spaces or dots which are problematic on Windows
+    safe_client = safe_client.rstrip(" .")
     return f"{yyyymmdd}-{seq}---{safe_client}---{status}.log"
 
 
